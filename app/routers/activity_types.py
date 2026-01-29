@@ -36,7 +36,7 @@ async def list_activity_types(
         db.query(ActivityTypeModel)
         .filter(
             or_(
-                ActivityTypeModel.is_default == True,
+                ActivityTypeModel.is_default.is_(True),
                 ActivityTypeModel.pack_id == pack_id,
             )
         )
