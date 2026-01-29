@@ -5,8 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.db import Base, engine, get_db
-from app.models.item import Item as ItemModel
-from app.routers import auth
+from app.models import Item as ItemModel
+from app.models import Pack, PackInvitation, PackMember
+from app.routers import auth, packs
 from app.schemas.item import Item as ItemSchema
 
 
@@ -59,6 +60,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(packs.router, prefix="/api/v1")
 
 
 @app.get("/")
