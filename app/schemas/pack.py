@@ -44,6 +44,7 @@ class PackInvitationCreate(BaseModel):
 class PackInvitation(BaseModel):
     id: int
     email: str
+    token: str
     expires_at: datetime
     created_at: datetime
 
