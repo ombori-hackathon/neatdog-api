@@ -22,7 +22,9 @@ def seed_activity_types(db: Session):
     - is_default = True
     """
     # Check if default types already exist
-    existing_defaults = db.query(ActivityType).filter(ActivityType.is_default.is_(True)).count()
+    existing_defaults = (
+        db.query(ActivityType).filter(ActivityType.is_default.is_(True)).count()
+    )
 
     if existing_defaults == 0:
         default_types = [

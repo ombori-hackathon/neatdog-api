@@ -5,8 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.db import Base, engine, get_db
-from app.models import ActivityLog, ActivityType, Dog, Item as ItemModel
-from app.models import Pack, PackInvitation, PackMember
+from app.models import Item as ItemModel
 from app.routers import activities, activity_types, auth, dogs, packs
 from app.schemas.item import Item as ItemSchema
 from app.seed.activity_types import seed_activity_types

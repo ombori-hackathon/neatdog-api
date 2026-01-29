@@ -8,11 +8,9 @@ from app.db import get_db
 from app.models.activity_log import ActivityLog
 from app.models.activity_type import ActivityType
 from app.models.dog import Dog
-from app.models.pack import Pack
 from app.models.user import User
 from app.routers.packs import verify_pack_member
 from app.schemas.activity_log import (
-    ActivityLog as ActivityLogSchema,
     ActivityLogCreate,
     ActivityLogWithDetails,
 )

@@ -16,7 +16,9 @@ class ActivityLog(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)  # who logged it
     notes = Column(String, nullable=True)  # optional notes
     logged_at = Column(DateTime, nullable=False)  # when activity occurred
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)  # when record was created
+    created_at = Column(
+        DateTime, nullable=False, default=datetime.utcnow
+    )  # when record was created
 
     # Relationships
     pack = relationship("Pack")

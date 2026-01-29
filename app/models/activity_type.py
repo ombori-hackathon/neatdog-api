@@ -1,6 +1,14 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.db import Base
@@ -13,7 +21,9 @@ class ActivityType(Base):
     name = Column(String, nullable=False)
     icon = Column(String, nullable=False)  # SF Symbol name
     color = Column(String, nullable=False)  # hex color
-    pack_id = Column(Integer, ForeignKey("packs.id"), nullable=True)  # null for default types
+    pack_id = Column(
+        Integer, ForeignKey("packs.id"), nullable=True
+    )  # null for default types
     is_default = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 

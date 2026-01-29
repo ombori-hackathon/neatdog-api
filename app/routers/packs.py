@@ -12,11 +12,15 @@ from app.models.pack_member import PackMember
 from app.models.user import User
 from app.schemas.pack import (
     AcceptInvitation,
-    Pack as PackSchema,
     PackCreate,
-    PackInvitation as PackInvitationSchema,
     PackInvitationCreate,
     PackWithMembers,
+)
+from app.schemas.pack import (
+    Pack as PackSchema,
+)
+from app.schemas.pack import (
+    PackInvitation as PackInvitationSchema,
 )
 
 router = APIRouter(prefix="/packs", tags=["packs"])
@@ -46,7 +50,9 @@ async def verify_pack_member(
     # Check if pack exists
     pack = db.query(Pack).filter(Pack.id == pack_id).first()
     if not pack:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pack not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Pack not found"
+        )
 
     # Check membership
     member = (
@@ -111,9 +117,7 @@ async def list_packs(
     """
     # Get all pack memberships for the user
     memberships = (
-        db.query(PackMember)
-        .filter(PackMember.user_id == current_user.id)
-        .all()
+        db.query(PackMember).filter(PackMember.user_id == current_user.id).all()
     )
 
     # Get the packs
@@ -141,7 +145,11 @@ async def get_pack(
     return pack
 
 
-@router.post("/{pack_id}/invitations", response_model=PackInvitationSchema, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/{pack_id}/invitations",
+    response_model=PackInvitationSchema,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_invitation(
     pack_id: int,
     invitation_data: PackInvitationCreate,
@@ -152,14 +160,18 @@ async def create_invitation(
     Invite a user to a pack by email. Only owners and admins can invite.
     """
     # Verify user is owner or admin
-    await verify_pack_member(pack_id, current_user, db, required_roles=["owner", "admin"])
+    await verify_pack_member(
+        pack_id, current_user, db, required_roles=["owner", "admin"]
+    )
 
     # Check if user is already a member
     existing_user = db.query(User).filter(User.email == invitation_data.email).first()
     if existing_user:
         existing_member = (
             db.query(PackMember)
-            .filter(PackMember.pack_id == pack_id, PackMember.user_id == existing_user.id)
+            .filter(
+                PackMember.pack_id == pack_id, PackMember.user_id == existing_user.id
+            )
             .first()
         )
         if existing_member:
