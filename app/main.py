@@ -1,21 +1,31 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.db import Base, engine, get_db
-from app.models.item import Item as ItemModel
+from app.models import Item as ItemModel
+from app.routers import activities, activity_types, auth, dogs, packs
 from app.schemas.item import Item as ItemSchema
+from app.seed.activity_types import seed_activity_types
 
 
 def seed_database(db: Session):
     """Seed the database with sample items if empty"""
     if db.query(ItemModel).count() == 0:
         sample_items = [
-            ItemModel(name="Widget", description="A useful widget for your desk", price=9.99),
-            ItemModel(name="Gadget", description="A fancy gadget with buttons", price=19.99),
-            ItemModel(name="Gizmo", description="An amazing gizmo that does things", price=29.99),
+            ItemModel(
+                name="Widget", description="A useful widget for your desk", price=9.99
+            ),
+            ItemModel(
+                name="Gadget", description="A fancy gadget with buttons", price=19.99
+            ),
+            ItemModel(
+                name="Gizmo",
+                description="An amazing gizmo that does things",
+                price=29.99,
+            ),
         ]
         db.add_all(sample_items)
         db.commit()
@@ -28,6 +38,7 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     db = next(get_db())
     seed_database(db)
+    seed_activity_types(db)
     db.close()
     yield
     # Shutdown: cleanup if needed
@@ -47,6 +58,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(auth.router, prefix="/api/v1")
+app.include_router(packs.router, prefix="/api/v1")
+app.include_router(dogs.router, prefix="/api/v1")
+app.include_router(activity_types.router, prefix="/api/v1")
+app.include_router(activities.router, prefix="/api/v1")
 
 
 @app.get("/")
