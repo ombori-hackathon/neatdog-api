@@ -18,3 +18,5 @@ class Pack(Base):
     creator = relationship("User", foreign_keys=[created_by])
     members = relationship("PackMember", back_populates="pack", cascade="all, delete-orphan")
     invitations = relationship("PackInvitation", back_populates="pack", cascade="all, delete-orphan")
+    dog = relationship("Dog", back_populates="pack", uselist=False, cascade="all, delete-orphan")
+    activity_types = relationship("ActivityType", back_populates="pack", cascade="all, delete-orphan")
