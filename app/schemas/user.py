@@ -30,7 +30,18 @@ class Token(BaseModel):
     token_type: str = "bearer"
 
 
+class AuthResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    user: User
+
+
 class TokenPayload(BaseModel):
-    sub: int  # user id
+    sub: str  # user id as string
     exp: int
     type: str  # "access" or "refresh"
+
+    @property
+    def user_id(self) -> int:
+        return int(self.sub)

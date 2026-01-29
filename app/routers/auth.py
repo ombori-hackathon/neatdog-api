@@ -6,12 +6,14 @@ from app.auth.jwt import create_access_token, create_refresh_token, decode_token
 from app.auth.password import hash_password, verify_password
 from app.db import get_db
 from app.models.user import User as UserModel
-from app.schemas.user import Token, User, UserCreate, UserLogin
+from app.schemas.user import AuthResponse, User, UserCreate, UserLogin
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.post("/signup", response_model=Token, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/signup", response_model=AuthResponse, status_code=status.HTTP_201_CREATED
+)
 async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
     """Create a new user account."""
     # Check if email already exists
@@ -39,14 +41,15 @@ async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
     access_token = create_access_token(new_user.id)
     refresh_token = create_refresh_token(new_user.id)
 
-    return Token(
+    return AuthResponse(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer",
+        user=User.model_validate(new_user),
     )
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=AuthResponse)
 async def login(credentials: UserLogin, db: Session = Depends(get_db)):
     """Authenticate a user and return tokens."""
     # Find user by email
@@ -68,14 +71,15 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
     access_token = create_access_token(user.id)
     refresh_token = create_refresh_token(user.id)
 
-    return Token(
+    return AuthResponse(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer",
+        user=User.model_validate(user),
     )
 
 
-@router.post("/refresh", response_model=Token)
+@router.post("/refresh", response_model=AuthResponse)
 async def refresh(token: str, db: Session = Depends(get_db)):
     """Refresh an access token using a refresh token."""
     try:
@@ -94,7 +98,7 @@ async def refresh(token: str, db: Session = Depends(get_db)):
         )
 
     # Verify user exists
-    user = db.query(UserModel).filter(UserModel.id == token_data.sub).first()
+    user = db.query(UserModel).filter(UserModel.id == token_data.user_id).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -105,10 +109,11 @@ async def refresh(token: str, db: Session = Depends(get_db)):
     access_token = create_access_token(user.id)
     new_refresh_token = create_refresh_token(user.id)
 
-    return Token(
+    return AuthResponse(
         access_token=access_token,
         refresh_token=new_refresh_token,
         token_type="bearer",
+        user=User.model_validate(user),
     )
 
 

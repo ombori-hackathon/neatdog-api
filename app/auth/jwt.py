@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+import time
 
 from jose import JWTError, jwt
 
@@ -8,10 +8,10 @@ from app.schemas.user import TokenPayload
 
 def create_access_token(user_id: int) -> str:
     """Create a JWT access token for the given user ID."""
-    expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
+    expire = int(time.time()) + (settings.access_token_expire_minutes * 60)
     payload = {
-        "sub": user_id,
-        "exp": int(expire.timestamp()),
+        "sub": str(user_id),
+        "exp": expire,
         "type": "access",
     }
     return jwt.encode(payload, settings.jwt_secret_key, algorithm="HS256")
@@ -19,10 +19,10 @@ def create_access_token(user_id: int) -> str:
 
 def create_refresh_token(user_id: int) -> str:
     """Create a JWT refresh token for the given user ID."""
-    expire = datetime.utcnow() + timedelta(days=settings.refresh_token_expire_days)
+    expire = int(time.time()) + (settings.refresh_token_expire_days * 24 * 60 * 60)
     payload = {
-        "sub": user_id,
-        "exp": int(expire.timestamp()),
+        "sub": str(user_id),
+        "exp": expire,
         "type": "refresh",
     }
     return jwt.encode(payload, settings.jwt_secret_key, algorithm="HS256")

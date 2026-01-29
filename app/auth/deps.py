@@ -34,7 +34,7 @@ async def get_current_user(
         )
 
     # Get user from database
-    user = db.query(User).filter(User.id == token_data.sub).first()
+    user = db.query(User).filter(User.id == token_data.user_id).first()
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
